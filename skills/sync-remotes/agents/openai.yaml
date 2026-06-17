@@ -1,0 +1,7 @@
+interface:
+  display_name: "Sync Remotes"
+  short_description: "Fetch manifest-defined remotes"
+  default_prompt: "Use $sync-remotes to add or fetch remotes from the fork-maintenance manifest."
+
+policy:
+  allow_implicit_invocation: false

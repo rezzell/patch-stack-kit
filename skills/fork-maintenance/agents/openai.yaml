@@ -1,0 +1,7 @@
+interface:
+  display_name: "Fork Maintenance"
+  short_description: "Run the full fork maintenance cycle"
+  default_prompt: "Use $fork-maintenance to run the full manifest-driven fork maintenance cycle."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "List Features"
+  short_description: "Inspect the current feature stack"
+  default_prompt: "Use $list-features to print the current manifest feature list."
+
+policy:
+  allow_implicit_invocation: false

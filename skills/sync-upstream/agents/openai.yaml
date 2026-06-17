@@ -1,0 +1,7 @@
+interface:
+  display_name: "Sync Upstream"
+  short_description: "Fast-forward main and rebase local branches"
+  default_prompt: "Use $sync-upstream to fast-forward main from upstream and rebase local feature branches."
+
+policy:
+  allow_implicit_invocation: false
