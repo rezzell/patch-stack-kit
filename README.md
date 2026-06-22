@@ -14,6 +14,21 @@ This repository is a source tree for a local Codex skill plus Claude Code instal
 - `CLAUDE.md`: repo-local Claude Code instructions
 - `scripts/install.sh`: installer for local machine or project copies
 
+## Manifest Discovery And Bootstrap
+
+All fork-maintenance skills share one manifest discovery contract.
+
+Supported manifest locations, in order:
+
+1. `.codex/patch-stack.yaml`
+2. `.claude/patch-stack.yaml`
+3. `.agents/patch-stack.yaml`
+4. `patch-stack.yaml` in the repository root
+
+If more than one agent-specific manifest exists, the run must fail instead of guessing.
+
+If no supported manifest exists in the working tree, the skills must check for branch `fork-maintenance/bootstrap`. When present, that branch is imported as the bootstrap source and its paths are preserved exactly as stored. When absent, the run must stop and report the missing branch plus the checked manifest locations.
+
 ## Install
 
 ### Codex
@@ -50,7 +65,7 @@ If you want the skill inside another repository:
 ./scripts/install.sh project /path/to/other-repo
 ```
 
-That installs all skills into `/path/to/other-repo/.codex/skills`, the shared reference into `/path/to/other-repo/.codex/references`, and copies `CLAUDE.md` if that file does not already exist.
+That installs all skills into `/path/to/other-repo/.codex/skills`, the shared reference into `/path/to/other-repo/.codex/references`, and copies `CLAUDE.md` if that file does not already exist. The target repository can keep its manifest in `.codex/patch-stack.yaml`, another supported agent-local location, or the repo root according to the shared discovery rules above.
 
 ## Notes
 
