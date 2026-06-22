@@ -7,7 +7,7 @@ description: Use when running the full manifest-driven fork maintenance cycle ac
 
 ## Overview
 
-This is the orchestrator skill. Read the shared reference, then call the step-level skills in sequence when the user wants the full maintenance cycle.
+This is the orchestrator skill. Read the shared reference, then run the full workflow in the exact order documented there. Do not improvise branch choices, manifest edit locations, or ending branches.
 
 ## When to Use
 
@@ -18,11 +18,14 @@ This is the orchestrator skill. Read the shared reference, then call the step-le
 ## Workflow
 
 1. Read [the shared reference](../../references/fork-maintenance.md).
-2. Sync upstream.
-3. Sync remotes.
-4. Create features if requested.
-5. Rebuild integration.
-6. List or inspect the resulting stack.
+2. Resolve the current branch, whether it is already tracked, and whether the user wants it added when it is missing from the manifest.
+3. Ask the user where the run should end before switching branches. Suggest the current branch, the manifest branch, or `integration/latest`.
+4. Check out `main` and run the strict sync order from the shared reference: `upstream/main` when present, then `origin/main`, then alignment of `origin/main` with the synced local `main`.
+5. Re-run manifest discovery after sync and use that result for the remaining steps.
+6. Create or update tracked feature branches, including the current-branch adoption case when requested.
+7. Rebuild `integration/latest` from the synced local `main` branch and the manifest entries in order.
+8. List or inspect the resulting stack.
+9. End on the branch the user selected at the start unless the workflow stopped on an error.
 
 ## Step Skills
 
@@ -36,3 +39,4 @@ This is the orchestrator skill. Read the shared reference, then call the step-le
 
 - Use the full cycle when the user asks for maintenance end-to-end.
 - Delegate to a step skill when the user wants only one action.
+- Report the manifest path, whether the current branch was adopted into the stack, the synced `main` base commit, and the final branch selection.
