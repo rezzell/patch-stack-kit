@@ -1,5 +1,7 @@
 # Fork Maintenance Skill
 
+[![skills.sh](https://skills.sh/b/rezzell/patch-stack-kit)](https://skills.sh/rezzell/patch-stack-kit)
+
 This repository is a source tree for a local Codex skill plus Claude Code install guidance.
 
 ## What is here
@@ -11,6 +13,8 @@ This repository is a source tree for a local Codex skill plus Claude Code instal
 - `skills/rebuild-integration/SKILL.md`: step skill for integration rebuild
 - `skills/list-features/SKILL.md`: step skill for stack inspection
 - `references/fork-maintenance.md`: shared manifest and workflow reference
+- `SKILL.md`: package-manager entry point that keeps the bundle self-contained
+- `apm.yml`: Agent Package Manager metadata
 - `CLAUDE.md`: repo-local Claude Code instructions
 - `scripts/install.sh`: installer for local machine or project copies
 
@@ -29,7 +33,37 @@ If more than one agent-specific manifest exists, the run must fail instead of gu
 
 If no supported manifest exists in the working tree, the skills must check for branch `fork-maintenance/bootstrap`. When present, that branch is imported as the bootstrap source and its paths are preserved exactly as stored. When absent, the run must stop and report the missing branch plus the checked manifest locations.
 
-## Install
+## Package Manager Install
+
+These installs use the root `SKILL.md` bundle so `references/` and the focused step skills remain available together.
+
+The npm-based CLIs currently expect a modern Node runtime; use Node 20 or newer, for example `nvm use 22`, if local `npx` execution fails.
+
+### APM
+
+```bash
+apm install rezzell/patch-stack-kit
+```
+
+### skillfish / skill.fish
+
+```bash
+npx skillfish add rezzell/patch-stack-kit fork-maintenance
+```
+
+To submit or refresh the listing:
+
+```bash
+npx skillfish submit rezzell/patch-stack-kit
+```
+
+### skills.sh / `npx skills`
+
+```bash
+npx skills add rezzell/patch-stack-kit --skill fork-maintenance
+```
+
+## Local Install
 
 ### Codex
 

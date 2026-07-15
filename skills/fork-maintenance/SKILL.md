@@ -17,7 +17,7 @@ This is the orchestrator skill. Read the shared reference, then run the full wor
 
 ## Workflow
 
-1. Read [the shared reference](../../references/fork-maintenance.md).
+1. Read [the shared reference](references/fork-maintenance.md).
 2. Resolve the current branch, whether it is already tracked, and whether the user wants it added when it is missing from the manifest.
 3. Ask the user where the run should end before switching branches. Suggest the current branch, the manifest branch, or `integration/latest`.
 4. Check out `main` and run the strict sync order from the shared reference: `upstream/main` when present, then `origin/main`, then alignment of `origin/main` with the synced local `main`.
