@@ -17,6 +17,6 @@ For the current-branch adoption case:
 - If the resolved manifest is only a local working-tree file on the current branch, edit it in place and add the current branch there.
 - If the manifest update belongs on another branch, require the current branch to be clean before switching, then switch to the manifest branch and update the manifest there.
 - Do not create an extra branch to represent work that already exists on the current branch.
-- If a branch switch is needed, ask the user where they want the run to end before switching away. Suggest the current branch, the manifest branch, or `integration/latest` when this step is part of the full maintenance flow.
+- If a branch switch is needed, ask the user where they want the run to end before switching away. Suggest the current branch, the manifest branch, or `path.finish` when this step is part of the full maintenance flow.
 
 Use this skill when the user wants only feature creation.

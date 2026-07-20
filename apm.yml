@@ -1,3 +1,16 @@
 name: patch-stack-kit
-version: 0.1.0
+version: "0.1.0"
 description: Manifest-driven fork maintenance skill bundle for downstream patch stacks.
+type: skill
+repository: https://github.com/rezzell/patch-stack-kit
+homepage: https://github.com/rezzell/patch-stack-kit
+keywords:
+  - agent-skills
+  - claude-code
+  - codex
+  - fork-maintenance
+  - patch-stack
+targets:
+  - claude
+  - codex
+includes: auto

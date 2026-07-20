@@ -2,7 +2,7 @@
 
 [![skills.sh](https://skills.sh/b/rezzell/patch-stack-kit)](https://skills.sh/rezzell/patch-stack-kit)
 
-This repository is a source tree for a local Codex skill plus Claude Code install guidance.
+This repository is an Agent Skills-compatible source tree for a fork-maintenance bundle. It can be installed with APM, skill.fish, skills.sh, or the local installer without moving the existing root bundle, nested step skills, references, or scripts.
 
 ## What is here
 
@@ -14,7 +14,7 @@ This repository is a source tree for a local Codex skill plus Claude Code instal
 - `skills/list-features/SKILL.md`: step skill for stack inspection
 - `references/fork-maintenance.md`: shared manifest and workflow reference
 - `SKILL.md`: package-manager entry point that keeps the bundle self-contained
-- `apm.yml`: Agent Package Manager metadata
+- `apm.yml`: Agent Package Manager metadata for Claude Code and Codex targets
 - `CLAUDE.md`: repo-local Claude Code instructions
 - `scripts/install.sh`: installer for local machine or project copies
 
@@ -41,8 +41,17 @@ The npm-based CLIs currently expect a modern Node runtime; use Node 20 or newer,
 
 ### APM
 
+APM is the preferred path when you want a reproducible manifest and lockfile. This repo keeps its existing source layout and uses `includes: auto`, which APM recognizes for root `SKILL.md` and nested `skills/<name>/SKILL.md` packages.
+
 ```bash
 apm install rezzell/patch-stack-kit
+```
+
+The package pins Claude Code and Codex as its default APM targets. For another popular client, pass a target explicitly from the consuming repo, for example:
+
+```bash
+apm install rezzell/patch-stack-kit --target cursor
+apm install rezzell/patch-stack-kit --target copilot
 ```
 
 ### skillfish / skill.fish
@@ -56,6 +65,8 @@ To submit or refresh the listing:
 ```bash
 npx skillfish submit rezzell/patch-stack-kit
 ```
+
+This repo does not commit a `skillfish.json` manifest because skillfish uses that file to sync external skills across a team. These skills are local source in this repository and should stay version-controlled directly.
 
 ### skills.sh / `npx skills`
 

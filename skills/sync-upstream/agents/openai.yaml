@@ -1,7 +1,7 @@
 interface:
   display_name: "Sync Upstream"
-  short_description: "Fast-forward main and rebase local branches"
-  default_prompt: "Use $sync-upstream to fast-forward main from upstream and rebase local feature branches."
+  short_description: "Fast-forward the manifest start branch"
+  default_prompt: "Use $sync-upstream to fast-forward the manifest start branch from upstream and origin."
 
 policy:
   allow_implicit_invocation: false

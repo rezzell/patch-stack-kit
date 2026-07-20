@@ -1,7 +1,7 @@
 interface:
   display_name: "Rebuild Integration"
-  short_description: "Rebuild integration/latest from the stack"
-  default_prompt: "Use $rebuild-integration to reconstruct integration/latest from the active features."
+  short_description: "Rebuild the manifest finish branch"
+  default_prompt: "Use $rebuild-integration to reconstruct the manifest finish branch from the active features."
 
 policy:
   allow_implicit_invocation: false

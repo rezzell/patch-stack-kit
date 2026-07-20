@@ -4,8 +4,36 @@ This repository defines a manifest-driven workflow for maintaining a downstream 
 
 ## Shared Source of Truth
 
-- `patch-stack.yaml` describes upstream, integration, remotes, and features.
+- `patch-stack.yaml` describes upstream, remotes, the branch path, and features.
 - All skills in this bundle use the same manifest and command conventions.
+
+## Manifest Branch Path
+
+Every new or edited `patch-stack.yaml` must declare the branch path explicitly:
+
+```yaml
+path:
+  start: main
+  finish: integration/latest
+features:
+  - branch: feature/example
+```
+
+Path fields:
+
+- `path.start` is the branch the stack starts from. Sync this branch before feature updates and use its synced commit as the integration rebuild base.
+- `features` is the ordered list of patch branches to apply. Treat each feature entry as one patch in the stack.
+- `path.finish` is the branch that receives the fully rebuilt stack after all active feature entries have been applied.
+
+The deterministic branch path is always:
+
+`path.start` -> each active `features[].branch` entry in manifest order -> `path.finish`
+
+Do not infer `path.start` from the branch where the user begins the run. The starting worktree branch is only the branch admission candidate. If the user has just committed work on that branch and wants it tracked, add that same branch to `features`; still start the rebuild from `path.start`.
+
+For legacy manifests that do not yet include `path`, use `main` as `path.start` and `integration/latest` as `path.finish`, report that legacy defaults were used, and add the explicit `path` block the next time the manifest is edited.
+
+If a manifest has a `path` block, both `path.start` and `path.finish` are required. Stop before branch switching when either field is missing.
 
 ## Manifest Discovery
 
@@ -53,7 +81,7 @@ Preflight rules:
 - If discovery says bootstrap is required, complete bootstrap import first, then resume current-branch admission using the imported manifest path.
 - Determine the current branch name before checking out anything else.
 - If the current branch is already listed in the manifest feature stack, continue normally.
-- If the current branch is `main`, `integration/latest`, or the bootstrap branch, continue normally.
+- If the current branch is `path.start`, `path.finish`, or the bootstrap branch, continue normally.
 - If the current branch is not listed in the manifest, stop and ask the user whether they want that branch added to the manifest, ignored for this run, or whether the run should stop.
 
 If the user wants the current branch added to the stack:
@@ -78,53 +106,55 @@ Required end-state prompt:
 - Suggest these destinations explicitly:
   - the current branch
   - the branch that carries the manifest update
-  - the full maintenance landing point on `integration/latest`
+  - the full maintenance landing point from `path.finish`
 
 Do not guess the final branch from prior runs. Record the chosen destination and honor it at the end unless the workflow stops on an error first.
 
-## Main Sync Contract
+## Start Branch Sync Contract
 
-After the current-branch decision is resolved, the full maintenance workflow returns to `main` and refreshes it in a strict order.
+After the current-branch decision is resolved, the full maintenance workflow switches to `path.start` and refreshes it in a strict order.
 
 Required order:
 
-1. Check out local `main`.
-2. If remote `upstream` exists, fetch `upstream/main` and fast-forward local `main` from it.
-3. Fetch `origin/main`.
-4. Fast-forward local `main` from `origin/main` when that is newer and still fast-forward compatible.
-5. If both `upstream/main` and `origin/main` exist, ensure `origin/main` is brought up to the chosen local `main` commit or stop and report why that sync could not be completed.
+1. Check out local `path.start`.
+2. If remote `upstream` exists, fetch `upstream/<path.start>` and fast-forward local `path.start` from it.
+3. Fetch `origin/<path.start>`.
+4. Fast-forward local `path.start` from `origin/<path.start>` when that is newer and still fast-forward compatible.
+5. If both `upstream/<path.start>` and `origin/<path.start>` exist, ensure `origin/<path.start>` is brought up to the chosen local `path.start` commit or stop and report why that sync could not be completed.
 
-The result of this step must be one clean local `main` branch that reflects the most up-to-date fast-forwardable history from `upstream/main` and `origin/main`.
+The result of this step must be one clean local `path.start` branch that reflects the most up-to-date fast-forwardable history from `upstream/<path.start>` and `origin/<path.start>`.
 
 ## Authoritative Post-Sync Discovery
 
 The full maintenance workflow performs manifest discovery twice:
 
 - a preflight discovery before current-branch admission
-- an authoritative discovery after `main` has been synced
+- an authoritative discovery after `path.start` has been synced
 
-The post-sync discovery result is the one used for feature updates and for rebuilding `integration/latest`.
+The post-sync discovery result is the one used for feature updates and for rebuilding `path.finish`.
+
+Re-resolve the branch path from the post-sync manifest. If the authoritative manifest changes `path.start` or `path.finish`, report the updated branch path before continuing.
 
 ## Canonical Step Order
 
-1. Resolve the current branch, manifest location, and desired end state.
-2. Sync local `main` from `upstream/main` when present, then from `origin/main`.
-3. Sync remotes and ensure `origin/main` is current with the synced `main` commit.
+1. Resolve the current branch, manifest location, branch path, and desired end state.
+2. Sync local `path.start` from `upstream/<path.start>` when present, then from `origin/<path.start>`.
+3. Sync remotes and ensure `origin/<path.start>` is current with the synced `path.start` commit.
 4. Re-run manifest discovery from the synced repository state.
 5. Create or update tracked feature branches.
-6. Rebuild `integration/latest` from the synced local `main` branch and the active manifest entries in order.
+6. Rebuild `path.finish` from the synced local `path.start` branch and the active manifest entries in order.
 7. End on the branch the user selected at the start.
 
 ## Safety Rules
 
-- Fast-forward `main` only.
+- Fast-forward `path.start` only during the start-branch sync step.
 - Never create an extra branch when the user wants the current branch added to the manifest.
-- Never hand-edit `integration/latest`.
+- Never hand-edit `path.finish`.
 - Never assume another skill invocation has already prepared the repository.
-- Preserve `order`, `depends_on`, and `pinned_commits`.
+- Preserve `path`, `order`, `depends_on`, and `pinned_commits`.
 - Preserve imported bootstrap paths as-is; do not rewrite manifest locations after import.
 - Require a clean current branch before switching away to edit a manifest that lives on another branch.
-- Rebuild `integration/latest` from synced local `main`, never by incrementally editing the previous `integration/latest`.
+- Rebuild `path.finish` from synced local `path.start`, never by incrementally editing the previous `path.finish`.
 - Stop on conflicts and report the exact feature or commit range that failed.
 - Stop on manifest discovery or bootstrap failure before running sync, feature creation, rebuild, or list operations.
 - Use dry-run mode first when the action is destructive or uncertain.
@@ -134,8 +164,9 @@ The post-sync discovery result is the one used for feature updates and for rebui
 - Report the resolved manifest path, or state that bootstrap was required.
 - If bootstrap is used, report the bootstrap branch name.
 - Report whether the current branch was already tracked, newly added, or intentionally left out for this run.
+- Report the resolved branch path before switching away from the starting branch.
 - Report the chosen final branch before switching away from the starting branch.
-- Report the synced `main` commit that became the integration base.
+- Report the synced `path.start` commit that became the integration base.
 - Report commit IDs after sync or rebuild steps.
 - Report conflicts immediately.
 - Keep the manifest as the source of truth for active features and ordering.
