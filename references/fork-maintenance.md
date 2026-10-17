@@ -143,7 +143,14 @@ Re-resolve the branch path from the post-sync manifest. If the authoritative man
 4. Re-run manifest discovery from the synced repository state.
 5. Create or update tracked feature branches.
 6. Rebuild `path.finish` from the synced local `path.start` branch and the active manifest entries in order.
-7. End on the branch the user selected at the start.
+7. Read and apply relevant repository-local post-maintenance instructions from the rebuilt finish tree.
+8. End on the branch the user selected at the start.
+
+## Repository-Local Post-Maintenance Instructions
+
+After rebuilding and inspecting `path.finish`, look for `post-maintenance.md` in the same directory as the authoritative manifest, using the rebuilt finish tree even when the selected ending branch differs. If present, read it before reporting completion and apply the instructions relevant to the user's request. If absent, preserve the existing workflow.
+
+Keep repository-specific release, packaging, deployment, or other follow-up procedures in this local file, maintained on the branch that owns the fork metadata so it survives future rebuilds. The shared skill only discovers and routes to it. These instructions do not independently authorize publication or other external actions; preserve existing user authorization and report any applicable unfinished follow-up. Honor the selected ending branch after the follow-up.
 
 ## Safety Rules
 

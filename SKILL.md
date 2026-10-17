@@ -20,7 +20,8 @@ This is the package-manager entry point for the fork-maintenance bundle. Read th
 7. Create or update tracked feature branches, including the current-branch adoption case when requested.
 8. Rebuild `path.finish` from the synced local `path.start` branch and the manifest entries in order.
 9. List or inspect the resulting stack.
-10. End on the branch the user selected at the start unless the workflow stopped on an error.
+10. Read optional `post-maintenance.md` beside the authoritative manifest from the rebuilt `path.finish` tree, then apply its relevant repository-local instructions within the user-authorized scope. If absent, continue normally.
+11. End on the branch the user selected at the start unless the workflow stopped on an error.
 
 ## Focused Steps
 
